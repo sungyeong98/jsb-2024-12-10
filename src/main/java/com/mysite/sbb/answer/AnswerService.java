@@ -2,12 +2,12 @@ package com.mysite.sbb.answer;
 
 import com.mysite.sbb.question.Question;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
-@Setter
+@Service
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
@@ -19,4 +19,5 @@ public class AnswerService {
         answer.setQuestion(question);
         this.answerRepository.save(answer);
     }
+
 }
