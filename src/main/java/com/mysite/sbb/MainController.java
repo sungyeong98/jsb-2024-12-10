@@ -6,15 +6,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
+
     @GetMapping("/")
-    @ResponseBody
     public String home() {
-        return "Home";
+        return "redirect:/question/list";
     }
 
-    @GetMapping("/about")
-    @ResponseBody
-    public String about() {
-        return "About";
-    }
 }
