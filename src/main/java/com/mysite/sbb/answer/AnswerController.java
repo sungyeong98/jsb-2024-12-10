@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
 import java.security.Principal;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RequestMapping("/answer")
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class AnswerController {
     private final AnswerService answerService;
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create/{id}")
     public String createAnswer(Model model, @PathVariable("id") Integer id, @Valid AnswerForm answerForm, BindingResult bindingResult, Principal principal) {
         Question question = this.questionService.getQuestion(id);
