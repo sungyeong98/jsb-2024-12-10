@@ -29,7 +29,7 @@ public class AnswerService {
         if (answer.isPresent()) {
             return answer.get();
         } else {
-            throw new DataNotFoundException("Answer not found");
+            throw new DataNotFoundException("answer not found");
         }
     }
 
