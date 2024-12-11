@@ -8,7 +8,14 @@ import com.mysite.sbb.DataNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.mysite.sbb.answer.Answer;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +28,30 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
-    public Page<Question> getList(int page) {
+    private Specification<Question> search(String kw) {
+        return new Specification<Question>() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public Predicate toPredicate(Root<Question> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                query.distinct(true);
+                Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
+                Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
+                Join<Question, SiteUser> u2 = q.join("author", JoinType.LEFT);
+                return cb.or(cb.like(q.get("subject"), "%" + kw + "%"),
+                        cb.like(q.get("content"), "%" + kw + "%"),
+                        cb.like(u1.get("username"), "%" + kw + "%"),
+                        cb.like(a.get("content"), "%" + kw + "%"),
+                        cb.like(u2.get("username"), "%" + kw + "%"));
+            }
+        };
+    }
+
+    public Page<Question> getList(int page, String kw) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-        return this.questionRepository.findAll(pageable);
+        Specification<Question> spec = search(kw);
+        return this.questionRepository.findAll(spec, pageable);
     }
 
     public Question getQuestion(Integer id) {
