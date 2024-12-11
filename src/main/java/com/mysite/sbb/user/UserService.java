@@ -1,11 +1,11 @@
 package com.mysite.sbb.user;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
-@Setter
+@Service
 public class UserService {
 
     private final UserRepository userRepository;
