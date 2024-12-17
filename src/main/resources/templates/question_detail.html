@@ -36,6 +36,9 @@
     <!-- 답변의 갯수 표시 -->
     <h5 class="border-bottom my-3 py-2"
         th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
+    <span>정렬</span>
+    <a href="javascript:void(0);" class="orderType btn-sm btn-outline-secondary" th:data-uri="@{|/question/detail/${question.id}?answerOrder=recommend|}" th:text="추천순"></a>
+    <a href="javascript:void(0);" class="orderType btn-sm btn-outline-secondary" th:data-uri="@{|/question/detail/${question.id}?answerOrder=time|}" th:text="최신순"></a>
     <!-- 답변 반복 시작 -->
     <div class="card my-3" th:each="answer, loop : ${answerPaging}">
         <a th:id="|answer_${answer.id}|"></a>
@@ -119,5 +122,12 @@
             };
         });
     });
+    const orderType_elements = document.getElementsByClassName("orderType");
+    Array.from(orderType_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            location.href = this.dataset.uri;
+        });
+    });
+
 </script>
 </html>

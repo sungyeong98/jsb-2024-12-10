@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import com.mysite.sbb.DataNotFoundException;
@@ -21,8 +22,18 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
 
-    public Page<Answer> getList(Question question, int page) {
-        List<Sort.Order> orders = List.of(new Sort.Order(Sort.Direction.DESC, "createDate"));
+    public Page<Answer> getList(Question question, int page, String type) {
+        List<Sort.Order> orders = new ArrayList<>();
+        switch (type) {
+            case "time":
+                orders.add(Sort.Order.desc("createDate"));
+                break;
+            case "recommend":
+                orders.add(Sort.Order.desc("voter"));
+                break;
+            default:
+                orders.add(Sort.Order.desc("createDate"));
+        }
         Pageable pageable = PageRequest.of(page, 5, Sort.by(orders));
         return this.answerRepository.findByQuestion(question, pageable);
     }
