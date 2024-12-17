@@ -1,6 +1,8 @@
 package com.mysite.sbb.question;
 
+import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerForm;
+import com.mysite.sbb.answer.AnswerService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -22,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final AnswerService answerService;
     private final UserService userService;
 
     @GetMapping("/list")
@@ -33,9 +36,11 @@ public class QuestionController {
     }
 
     @GetMapping(value="/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
+    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm, @RequestParam(value="answerPage", defaultValue="0") int page) {
         Question question = this.questionService.getQuestion(id);
+        Page<Answer> answerPaging = this.answerService.getList(question, page);
         model.addAttribute("question", question);
+        model.addAttribute("answerPaging", answerPaging);
         return "question_detail";
     }
 

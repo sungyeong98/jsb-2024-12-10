@@ -3,7 +3,13 @@ package com.mysite.sbb.answer;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.question.Question;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 import com.mysite.sbb.DataNotFoundException;
 
@@ -14,6 +20,12 @@ import java.time.LocalDateTime;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
+
+    public Page<Answer> getList(Question question, int page) {
+        List<Sort.Order> orders = List.of(new Sort.Order(Sort.Direction.DESC, "createDate"));
+        Pageable pageable = PageRequest.of(page, 5, Sort.by(orders));
+        return this.answerRepository.findByQuestion(question, pageable);
+    }
 
     public Answer create(Question question, String content, SiteUser author) {
         Answer answer = new Answer();
