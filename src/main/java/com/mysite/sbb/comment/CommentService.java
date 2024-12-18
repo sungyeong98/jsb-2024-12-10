@@ -26,7 +26,7 @@ public class CommentService {
         }
     }
 
-    public Comment createComment(Question question, Answer answer, SiteUser siteUser, String content) {
+    public Comment create(Question question, Answer answer, SiteUser siteUser, String content) {
         Comment comment = new Comment();
         comment.setContent(content);
         comment.setQuestion(question);
@@ -35,6 +35,17 @@ public class CommentService {
         comment.setCreateDate(LocalDateTime.now());
         this.commentRepository.save(comment);
         return comment;
+    }
+
+    public Comment modify(Comment comment, String content) {
+        comment.setContent(content);
+        comment.setModifyDate(LocalDateTime.now());
+        commentRepository.save(comment);
+        return comment;
+    }
+
+    public void delete(Comment comment) {
+        this.commentRepository.delete(comment);
     }
 
 }

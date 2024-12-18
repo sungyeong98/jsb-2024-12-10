@@ -30,7 +30,13 @@ public class CommentController {
     private final UserService userService;
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/create/question_comment/{id}")
+    @GetMapping("/create/question/{id}")
+    public String createQuestionCommentForm(CommentForm commentForm, @PathVariable("id") Integer id) {
+        return "comment_form";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/create/question/{id}")
     public String createQuestionComment(Model model, @PathVariable("id") Integer id, @Valid CommentForm commentForm, Principal principal, BindingResult bindingResult) {
         Question question = this.questionService.getQuestion(id);
         SiteUser siteUser = this.userService.getUser(principal.getName());
@@ -38,22 +44,28 @@ public class CommentController {
             model.addAttribute("question", question);
             return "question_detail";
         }
-        Comment comment = this.commentService.createComment(question, null, siteUser, commentForm.getContent());
-        return String.format("redirect:/question/detail/%s", id);
+        Comment comment = this.commentService.create(question, null, siteUser, commentForm.getContent());
+        return String.format("redirect:/question/detail/%s#comment_%s", comment.getQuestion().getId(), comment.getId());
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/create/answer_comment/{id}")
+    @GetMapping("/create/answer/{id}")
+    public String createAnswerCommentForm(CommentForm commentForm, @PathVariable("id") Integer id) {
+        return "comment_form";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/create/answer/{id}")
     public String createAnswerComment(Model model, @PathVariable("id") Integer id, @Valid CommentForm commentForm, Principal principal, BindingResult bindingResult) {
-        Question question = this.answerService.getAnswer(id).getQuestion();
         Answer answer = this.answerService.getAnswer(id);
+        Question question = answer.getQuestion();
         SiteUser siteUser = this.userService.getUser(principal.getName());
         if (bindingResult.hasErrors()) {
             model.addAttribute("question", question);
             return "question_detail";
         }
-        Comment comment = this.commentService.createComment(question, answer, siteUser, commentForm.getContent());
-        return String.format("redirect:/question/detail/%s#answer_%s", question.getId(), answer.getId());
+        this.commentService.create(null, answer, siteUser, commentForm.getContent());
+        return String.format("redirect:/question/detail/%s#answer_%s", question.getId(), id);
     }
 
 }
