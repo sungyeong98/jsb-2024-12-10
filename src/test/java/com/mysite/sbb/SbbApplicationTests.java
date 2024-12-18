@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerRepository;
+import com.mysite.sbb.category.Category;
+import com.mysite.sbb.category.CategoryService;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionRepository;
 import com.mysite.sbb.question.QuestionService;
@@ -19,14 +21,11 @@ import java.util.Optional;
 class SbbApplicationTests {
 
     @Autowired
-    private QuestionService questionService;
+    private CategoryService categoryService;
 
     @Test
     void testJpa() {
-        for (int i = 0; i <= 300; i++) {
-            String subject = String.format("테스트 데이터입니다:[%03d]", i);
-            String content = "내용무";
-            this.questionService.create(subject, content, null);
-        }
+        Category category = this.categoryService.getCategory("3번 게시판");
+        this.categoryService.modify(category, "자유게시판");
     }
 }

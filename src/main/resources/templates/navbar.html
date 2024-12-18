@@ -16,4 +16,13 @@
             </ul>
         </div>
     </div>
+    <table class="table">
+        <thead>
+            <tr class="text-center">
+                <th th:each="category, loop : ${categoryList}">
+                    <a class="nav-link" th:href="|/category/${category.name}|" th:text="${category.name}"></a>
+                </th>
+            </tr>
+        </thead>
+    </table>
 </nav>
