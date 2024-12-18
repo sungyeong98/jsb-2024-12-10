@@ -12,6 +12,9 @@
                 <li class="list-group-item">아이디: <span th:text="${siteUser.username}"></span></li>
                 <li class="list-group-item">이메일: <span th:text="${siteUser.email}"></span></li>
             </ul>
+            <div class="mt-3 d-flex justify-content-end">
+                <a class="btn btn-warning" th:href="@{/user/change-password}" role="button">비밀번호 변경</a>
+            </div>
         </div>
     </div>
 
