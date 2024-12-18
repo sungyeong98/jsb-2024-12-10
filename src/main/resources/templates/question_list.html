@@ -1,5 +1,25 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content" class="container my-3">
+
+    <div class="my-4">
+        <h3>카테고리</h3>
+        <ul class="nav nav-tabs">
+            <!-- "전체" 출력 -->
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/question/list}"
+                   th:classappend="${selectedCategory == '전체'} ? 'active'"
+                   th:text="'전체'"></a>
+            </li>
+
+            <!-- 카테고리 목록 출력 -->
+            <li class="nav-item" th:each="category : ${categoryList}">
+                <a class="nav-link" th:href="@{|/question/list?category=${category.name}|}"
+                   th:classappend="${selectedCategory == category.name} ? 'active'"
+                   th:text="${category.name}"></a>
+            </li>
+        </ul>
+    </div>
+
     <div class="row my-3">
         <div class="col-6">
             <a th:href="@{/question/create}" class="btn btn-primary">질문 등록하기</a>
