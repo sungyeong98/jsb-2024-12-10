@@ -18,11 +18,16 @@
     </div>
     <table class="table">
         <thead>
-            <tr class="text-center">
-                <th th:each="category, loop : ${categoryList}">
-                    <a class="nav-link" th:href="|/category/${category.name}|" th:text="${category.name}"></a>
-                </th>
-            </tr>
+        <tr class="text-center">
+            <th>
+                <a class="nav-link" th:href="@{/question/list}" th:text="'전체'" th:classappend="${selectedCategory == '전체'} ? 'active'"></a>
+            </th>
+            <th th:each="category: ${categoryList}">
+                <a class="nav-link" th:href="@{|/question/list?category=${category.name}|}"
+                   th:classappend="${selectedCategory == category.name} ? 'active'"
+                   th:text="${category.name}"></a>
+            </th>
+        </tr>
         </thead>
     </table>
 </nav>

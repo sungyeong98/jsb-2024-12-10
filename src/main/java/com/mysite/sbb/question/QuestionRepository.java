@@ -31,4 +31,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             + "   or u2.username like %:kw% ")
     Page<Question> findAllByKeyword(@Param("kw") String kw, Pageable pageable);
     Page<Question> findAllByCategory(Category category, Pageable pageable);
+
+    @Query("SELECT q FROM Question q WHERE q.category = :category AND (q.subject LIKE %:kw% OR q.content LIKE %:kw%)")
+    Page<Question> findAllByCategoryAndKeyword(@Param("category") Category category, @Param("kw") String kw, Pageable pageable);
 }

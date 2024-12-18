@@ -90,11 +90,12 @@ public class QuestionService {
         this.questionRepository.save(question);
     }
 
-    public Page<Question> getCategoryList(Category category, int page) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createDate"));
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-        return this.questionRepository.findAllByCategory(category, pageable);
+    public Page<Question> getCategoryList(Category category, int page, String kw) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
+        if (category != null) {
+            return this.questionRepository.findAllByCategoryAndKeyword(category, kw, pageable);
+        }
+        return this.getList(page, kw);
     }
 
 }

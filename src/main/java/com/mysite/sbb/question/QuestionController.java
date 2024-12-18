@@ -33,8 +33,18 @@ public class QuestionController {
     private final CategoryService categoryService;
 
     @GetMapping("/list")
-    public String list(Model model, @RequestParam(value="page", defaultValue="0") int page, @RequestParam(value="kw", defaultValue = "") String kw) {
-        Page<Question> paging = this.questionService.getList(page, kw);
+    public String list(Model model, @RequestParam(value="page", defaultValue="0") int page,
+                       @RequestParam(value="kw", defaultValue = "") String kw,
+                       @RequestParam(value = "category", required = false) String categoryName) {
+        Page<Question> paging;
+
+        if (categoryName != null && !categoryName.isEmpty()) {
+            Category category = this.categoryService.getCategory(categoryName);
+            paging = this.questionService.getCategoryList(category, page, kw);
+        } else {
+            paging = this.questionService.getList(page, kw);
+        }
+
         List<Category> categoryList = this.categoryService.getList();
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
