@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,6 +31,7 @@ public class UserController {
     private final QuestionService questionService;
     private final AnswerService answerService;
     private final CommentService commentService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {
@@ -89,6 +91,37 @@ public class UserController {
         model.addAttribute("commentPageData", commentPageData); // 댓글 데이터
 
         return "profile";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modify")
+    public String modifyPassword(UserModifyForm userModifyForm, Principal principal) {
+        return "password_change_form";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify")
+    public String modifyPassword(@Valid UserModifyForm userModifyForm, BindingResult bindingResult, Principal principal) {
+        SiteUser siteUser = this.userService.getUser(principal.getName());
+        if (bindingResult.hasErrors()) {
+            return "password_change_form";
+        }
+        if (!userModifyForm.getPassword1().equals(userModifyForm.getPassword2())) {
+            bindingResult.rejectValue("password2", "passwordInCorrect", "새 비밀번호가 일치하지 않습니다.");
+            return "password_change_form";
+        }
+        if (!this.passwordEncoder.matches(userModifyForm.getOriginPassword(), siteUser.getPassword())) {
+            bindingResult.rejectValue("originPassword", "passwordInCorrect", "기존 비밀번호가 일치하지 않습니다.");
+            return "password_change_form";
+        }
+
+        try {
+            this.userService.modify(siteUser, userModifyForm.getPassword1());
+        } catch (Exception e) {
+            e.printStackTrace();
+            bindingResult.reject("modifyFailed", e.getMessage());
+        }
+        return "redirect:/user/profile";
     }
 
 }

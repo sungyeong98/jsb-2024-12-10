@@ -31,4 +31,9 @@ public class UserService {
         }
     }
 
+    public void modify(SiteUser siteUser, String password) {
+        siteUser.setPassword(passwordEncoder.encode(password));
+        this.userRepository.save(siteUser);
+    }
+
 }
