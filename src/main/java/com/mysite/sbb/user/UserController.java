@@ -124,4 +124,14 @@ public class UserController {
         return "redirect:/user/profile";
     }
 
+    @GetMapping("/find")
+    public String findPassword(Model model) {
+        return "password_find_form";
+    }
+
+    @PostMapping("/find")
+    public String findPassword(Model model, @RequestParam("email") String email) {
+        return "redirect:/user/login";
+    }
+
 }
