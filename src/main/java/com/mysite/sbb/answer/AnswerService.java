@@ -72,4 +72,11 @@ public class AnswerService {
         this.answerRepository.save(answer);
     }
 
+    public Page<Answer> getMyList(SiteUser siteUser, int page) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 5, Sort.by(sorts));
+        return this.answerRepository.findByAuthor(siteUser, pageable);
+    }
+
 }
