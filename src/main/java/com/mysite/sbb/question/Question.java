@@ -4,6 +4,8 @@ import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.category.Category;
 import com.mysite.sbb.comment.Comment;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.ManyToOne;
@@ -46,4 +48,9 @@ public class Question {
 
     @ManyToOne
     private Category category;
+
+    @Column(columnDefinition = "INTEGER default 0")
+    @NotNull
+    private Integer views = 0;
+
 }
