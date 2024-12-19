@@ -35,6 +35,7 @@
         <thead class="table-dark">
             <tr class="text-center">
                 <th>번호</th>
+                <th>카테고리</th>
                 <th style="width:50%">제목</th>
                 <th>글쓴이</th>
                 <th>작성일시</th>
@@ -44,6 +45,7 @@
         <tbody>
             <tr class="text-center" th:each="question, loop : ${paging}">
                 <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
+                <td th:text="${question.category.name}"></td>   <!-- 카테고리명 출력 -->
                 <td class="text-start">
                     <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}"></a>
                     <span class="text-danger small ms-2"
@@ -94,6 +96,7 @@
     <form th:action="@{/question/list}" method="get" id="searchForm">
         <input type="hidden" id="kw" name="kw" th:value="${kw}">
         <input type="hidden" id="page" name="page" th:value="${paging.number}">
+        <input type="hidden" id="category" name="category" th:value="${selectedCategory}">
     </form>
     <!--a th:href="@{/question/create}" class="btn btn-primary">질문 등록하기</a-->
 </div>
