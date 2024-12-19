@@ -9,6 +9,7 @@ import com.mysite.sbb.question.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -32,6 +33,7 @@ public class UserController {
     private final AnswerService answerService;
     private final CommentService commentService;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender mailSender;
 
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {

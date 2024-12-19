@@ -36,4 +36,13 @@ public class UserService {
         this.userRepository.save(siteUser);
     }
 
+    public SiteUser getUserByEmail(String email) {
+        Optional<SiteUser> siteUser = this.userRepository.findByEmail(email);
+        if (siteUser.isPresent()) {
+            return siteUser.get();
+        } else {
+            throw new DataNotFoundException("User not found");
+        }
+    }
+
 }
