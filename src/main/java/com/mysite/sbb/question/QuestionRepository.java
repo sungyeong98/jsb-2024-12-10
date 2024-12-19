@@ -38,4 +38,33 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     Page<Question> findAllByCategoryAndKeyword(@Param("category") Category category, @Param("kw") String kw, Pageable pageable);
 
     Page<Question> findByAuthor(SiteUser author, Pageable pageable);
+
+    @Query("SELECT DISTINCT q FROM Question q " +
+            "LEFT JOIN q.answerList a " +
+            "LEFT JOIN q.commentList c " +  // commentList 추가
+            "WHERE " +
+            "   q.subject LIKE %:kw% OR " +
+            "   q.content LIKE %:kw% OR " +
+            "   a.content LIKE %:kw% OR " +
+            "   c.content LIKE %:kw% " + // commentList의 content도 검색에 포함
+            "ORDER BY " +
+            "   CASE WHEN :sortType = 'answerDate' THEN a.createDate END DESC, " +
+            "   CASE WHEN :sortType = 'createDate' THEN q.createDate END DESC, " +
+            "   CASE WHEN :sortType = 'commentDate' THEN c.createDate END DESC")
+    Page<Question> findAllWithSort(@Param("kw") String kw, @Param("sortType") String sortType, Pageable pageable);
+
+    @Query("SELECT DISTINCT q FROM Question q " +
+            "LEFT JOIN q.answerList a " +
+            "LEFT JOIN q.commentList c " +  // commentList 추가
+            "WHERE q.category = :category AND (" +
+            "   q.subject LIKE %:kw% OR " +
+            "   q.content LIKE %:kw% OR " +
+            "   a.content LIKE %:kw% OR " +
+            "   c.content LIKE %:kw%) " +
+            "ORDER BY " +
+            "   CASE WHEN :sortType = 'answerDate' THEN a.createDate END DESC, " +
+            "   CASE WHEN :sortType = 'createDate' THEN q.createDate END DESC, " +
+            "   CASE WHEN :sortType = 'commentDate' THEN c.createDate END DESC")
+    Page<Question> findAllByCategoryWithSort(@Param("category") Category category, @Param("kw") String kw, @Param("sortType") String sortType, Pageable pageable);
+
 }

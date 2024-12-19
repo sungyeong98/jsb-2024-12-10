@@ -32,27 +32,53 @@ public class QuestionController {
     private final UserService userService;
     private final CategoryService categoryService;
 
-    @GetMapping("/list")
-    public String list(Model model, @RequestParam(value="page", defaultValue="0") int page,
-                       @RequestParam(value="kw", defaultValue = "") String kw,
-                       @RequestParam(value = "category", required = false) String categoryName) {
-        Page<Question> paging;
+//    @GetMapping("/list")
+//    public String list(Model model,
+//                       @RequestParam(value="page", defaultValue="0") int page,
+//                       @RequestParam(value="kw", defaultValue = "") String kw,
+//                       @RequestParam(value = "category", required = false) String categoryName,
+//                       @RequestParam(value = "sortType", defaultValue = "createDate") String sortType) {
+//        Page<Question> paging;
+//
+//        if (categoryName != null && !categoryName.isEmpty()) {
+//            Category category = this.categoryService.getCategory(categoryName);
+//            paging = this.questionService.getCategoryList(category, page, kw);
+//            model.addAttribute("selectedCategory", categoryName);
+//        } else {
+//            paging = this.questionService.getList(page, kw);
+//            model.addAttribute("selectedCategory", "");
+//        }
+//
+//        List<Category> categoryList = this.categoryService.getList();
+//        model.addAttribute("paging", paging);
+//        model.addAttribute("kw", kw);
+//        model.addAttribute("categoryList", categoryList);
+//        return "question_list";
+//    }
 
+    @GetMapping("/list")
+    public String list(Model model,
+                       @RequestParam(value = "page", defaultValue = "0") int page,
+                       @RequestParam(value = "kw", defaultValue = "") String kw,
+                       @RequestParam(value = "category", required = false) String categoryName,
+                       @RequestParam(value = "sortType", defaultValue = "createDate") String sortType) {
+        Category category = null;
         if (categoryName != null && !categoryName.isEmpty()) {
-            Category category = this.categoryService.getCategory(categoryName);
-            paging = this.questionService.getCategoryList(category, page, kw);
-            model.addAttribute("selectedCategory", categoryName);
-        } else {
-            paging = this.questionService.getList(page, kw);
-            model.addAttribute("selectedCategory", "");
+            category = this.categoryService.getCategory(categoryName);
         }
+
+        Page<Question> paging = this.questionService.getSortedList(category, page, kw, sortType);
 
         List<Category> categoryList = this.categoryService.getList();
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
+        model.addAttribute("sortType", sortType);
         model.addAttribute("categoryList", categoryList);
+        model.addAttribute("selectedCategory", categoryName != null ? categoryName : "");
+
         return "question_list";
     }
+
 
     @GetMapping(value="/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,

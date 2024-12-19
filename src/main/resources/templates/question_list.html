@@ -31,6 +31,19 @@
             </div>
         </div>
     </div>
+    <div class="sort-options">
+        <span>정렬 기준:</span>
+        <a th:href="@{|/question/list?category=${selectedCategory}&sortType=createDate|}"
+           th:classappend="${sortType == 'createDate'} ? 'btn-primary' : 'btn-outline-secondary'"
+           class="btn btn-sm">작성시간</a>
+        <a th:href="@{|/question/list?category=${selectedCategory}&sortType=answerDate|}"
+           th:classappend="${sortType == 'answerDate'} ? 'btn-primary' : 'btn-outline-secondary'"
+           class="btn btn-sm">답변시간</a>
+        <a th:href="@{|/question/list?category=${selectedCategory}&sortType=commentDate|}"
+           th:classappend="${sortType == 'commentDate'} ? 'btn-primary' : 'btn-outline-secondary'"
+           class="btn btn-sm">댓글시간</a>
+    </div>
+
     <table class="table">
         <thead class="table-dark">
             <tr class="text-center">

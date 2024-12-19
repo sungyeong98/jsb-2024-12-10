@@ -54,6 +54,24 @@ public class QuestionService {
         return this.questionRepository.findAllByKeyword(kw, pageable);
     }
 
+    public Page<Question> getCategoryList(Category category, int page, String kw) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
+        if (category != null) {
+            return this.questionRepository.findAllByCategoryAndKeyword(category, kw, pageable);
+        }
+        return this.getList(page, kw);
+    }
+
+    public Page<Question> getSortedList(Category category, int page, String kw, String sortType) {
+        Pageable pageable = PageRequest.of(page, 10); // 기본 페이지 크기 설정
+
+        if (category != null) {
+            return this.questionRepository.findAllByCategoryWithSort(category, kw, sortType, pageable);
+        } else {
+            return this.questionRepository.findAllWithSort(kw, sortType, pageable);
+        }
+    }
+
     public Question getQuestion(Integer id) {
         Optional<Question> question = this.questionRepository.findById(id);
         if (question.isPresent()) {
@@ -88,14 +106,6 @@ public class QuestionService {
     public void vote(Question question, SiteUser siteUser) {
         question.getVoter().add(siteUser);
         this.questionRepository.save(question);
-    }
-
-    public Page<Question> getCategoryList(Category category, int page, String kw) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
-        if (category != null) {
-            return this.questionRepository.findAllByCategoryAndKeyword(category, kw, pageable);
-        }
-        return this.getList(page, kw);
     }
 
     public Page<Question> getMyList(SiteUser siteUser, int page) {
