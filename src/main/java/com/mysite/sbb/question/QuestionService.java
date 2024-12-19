@@ -105,4 +105,15 @@ public class QuestionService {
         return this.questionRepository.findByAuthor(siteUser, pageable);
     }
 
+    public void view(Integer id) {
+        Optional<Question> question = this.questionRepository.findById(id);
+        if (question.isPresent()) {
+            Question targetQuestion = question.get();
+            targetQuestion.setViews(targetQuestion.getViews() + 1);
+            this.questionRepository.save(targetQuestion);
+        } else {
+            throw new DataNotFoundException("question not found");
+        }
+    }
+
 }

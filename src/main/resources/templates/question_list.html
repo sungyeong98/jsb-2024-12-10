@@ -7,14 +7,14 @@
             <!-- "전체" 출력 -->
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/question/list}"
-                   th:classappend="${selectedCategory == '전체'} ? 'active'"
+                   th:classappend="${selectedCategory == '전체'} ? 'active border border-primary fw-bold'"
                    th:text="'전체'"></a>
             </li>
 
             <!-- 카테고리 목록 출력 -->
             <li class="nav-item" th:each="category : ${categoryList}">
                 <a class="nav-link" th:href="@{|/question/list?category=${category.name}|}"
-                   th:classappend="${selectedCategory == category.name} ? 'active'"
+                   th:classappend="${selectedCategory == category.name} ? 'active border border-primary fw-bold'"
                    th:text="${category.name}"></a>
             </li>
         </ul>
@@ -38,6 +38,7 @@
                 <th style="width:50%">제목</th>
                 <th>글쓴이</th>
                 <th>작성일시</th>
+                <th>조회수</th>
             </tr>
         </thead>
         <tbody>
@@ -52,6 +53,7 @@
                 </td>
                 <td><span th:if="${question.author != null}" th:text="${question.author.username}"></span></td>
                 <td th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${question.views}"></td>
             </tr>
         </tbody>
     </table>
