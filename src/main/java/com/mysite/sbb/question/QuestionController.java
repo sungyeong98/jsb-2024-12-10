@@ -41,8 +41,10 @@ public class QuestionController {
         if (categoryName != null && !categoryName.isEmpty()) {
             Category category = this.categoryService.getCategory(categoryName);
             paging = this.questionService.getCategoryList(category, page, kw);
+            model.addAttribute("selectedCategory", categoryName);
         } else {
             paging = this.questionService.getList(page, kw);
+            model.addAttribute("selectedCategory", "");
         }
 
         List<Category> categoryList = this.categoryService.getList();
