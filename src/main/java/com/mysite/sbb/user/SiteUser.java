@@ -1,6 +1,7 @@
 package com.mysite.sbb.user;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,4 +21,14 @@ public class SiteUser {
 
     @Column(unique = true)
     private String email;
+
+    private String registerId;
+    @Builder
+    public SiteUser() {
+    }
+    @Builder
+    public SiteUser(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }

@@ -22,6 +22,16 @@ public class UserService {
         return user;
     }
 
+    public SiteUser create(String registerId, String username, String email, String password) {
+        SiteUser user = new SiteUser();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRegisterId(registerId);
+        this.userRepository.save(user);
+        return user;
+    }
+
     public SiteUser getUser(String emailOrUsername) {
         Optional<SiteUser> siteUser = this.userRepository.findByUsername(emailOrUsername);
         if (siteUser.isPresent()) {
@@ -39,14 +49,18 @@ public class UserService {
         this.userRepository.save(siteUser);
     }
 
-    public boolean checkUser(String emailOrUsername) {
-        return this.userRepository.findByUsername(emailOrUsername).isPresent() 
-            || this.userRepository.findByEmail(emailOrUsername).isPresent();
-    }
-
     public void update(SiteUser siteUser, String password) {
         siteUser.setPassword(passwordEncoder.encode(password));
         this.userRepository.save(siteUser);
+    }
+
+    public SiteUser socialLogin(String registerId, String username, String email) {
+        Optional<SiteUser> siteUser = this.userRepository.findByEmail(email);
+        if (siteUser.isPresent()) {
+            return siteUser.get();
+        } else {
+            return this.create(registerId, username, email, "");
+        }
     }
 
 }
