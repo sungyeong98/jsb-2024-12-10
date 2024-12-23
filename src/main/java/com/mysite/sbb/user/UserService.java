@@ -22,13 +22,16 @@ public class UserService {
         return user;
     }
 
-    public SiteUser getUser(String username) {
-        Optional<SiteUser> siteUser = this.userRepository.findByUsername(username);
+    public SiteUser getUser(String emailOrUsername) {
+        Optional<SiteUser> siteUser = this.userRepository.findByUsername(emailOrUsername);
         if (siteUser.isPresent()) {
             return siteUser.get();
-        } else {
-            throw new DataNotFoundException("User not found");
         }
+        siteUser = this.userRepository.findByEmail(emailOrUsername);
+        if (siteUser.isPresent()) {
+            return siteUser.get();
+        }
+        throw new DataNotFoundException("사용자를 찾을 수 없습니다.");
     }
 
     public void modify(SiteUser siteUser, String password) {
@@ -36,13 +39,14 @@ public class UserService {
         this.userRepository.save(siteUser);
     }
 
-    public SiteUser getUserByEmail(String email) {
-        Optional<SiteUser> siteUser = this.userRepository.findByEmail(email);
-        if (siteUser.isPresent()) {
-            return siteUser.get();
-        } else {
-            throw new DataNotFoundException("User not found");
-        }
+    public boolean checkUser(String emailOrUsername) {
+        return this.userRepository.findByUsername(emailOrUsername).isPresent() 
+            || this.userRepository.findByEmail(emailOrUsername).isPresent();
+    }
+
+    public void update(SiteUser siteUser, String password) {
+        siteUser.setPassword(passwordEncoder.encode(password));
+        this.userRepository.save(siteUser);
     }
 
 }

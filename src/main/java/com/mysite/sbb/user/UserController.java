@@ -1,5 +1,6 @@
 package com.mysite.sbb.user;
 
+import com.mysite.sbb.DataNotFoundException;
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerService;
 import com.mysite.sbb.comment.Comment;
@@ -9,6 +10,7 @@ import com.mysite.sbb.question.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,8 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.security.SecureRandom;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Controller
@@ -132,8 +137,64 @@ public class UserController {
     }
 
     @PostMapping("/find")
-    public String findPassword(Model model, @RequestParam("email") String email) {
-        return "redirect:/user/login";
+    public String findPassword(Model model, @RequestParam("emailOrUsername") String emailOrUsername, RedirectAttributes redirectAttributes) {
+        try {
+            // 사용자 찾기
+            SiteUser siteUser = this.userService.getUser(emailOrUsername);
+            
+            // 이메일 메시지 준비
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(siteUser.getEmail()); // 항상 사용자의 이메일 주소를 사용
+            message.setSubject("임시 비밀번호가 발급되었습니다.");
+            
+            String token = PasswordGenerator.generateRandomPassword();
+            StringBuilder sb = new StringBuilder();
+            sb.append(siteUser.getUsername()).append("님의 비밀번호를 초기화하였습니다.\n")
+              .append("새로운 비밀번호는 ").append(token).append(" 입니다.\n")
+              .append("로그인 후 반드시 비밀번호를 변경해주세요.");
+            message.setText(sb.toString());
+            
+            this.userService.update(siteUser, token);
+            
+            // 이메일 전송
+            new Thread(() -> mailSender.send(message)).start();
+            
+            // 성공 메시지 설정
+            redirectAttributes.addFlashAttribute("message", 
+                String.format("'%s' 이메일로 임시 비밀번호가 전송되었습니다.", siteUser.getEmail()));
+            return "redirect:/user/login";
+            
+        } catch (DataNotFoundException e) {
+            model.addAttribute("error", "입력하신 정보와 일치하는 사용자가 없습니다.");
+            return "password_find_form";
+        } catch (Exception e) {
+            model.addAttribute("error", "비밀번호 재설정 중 오류가 발생했습니다.");
+            return "password_find_form";
+        }
+    }
+
+    public static class PasswordGenerator {
+        private static final String CHAR_LOWER = "abcdefghijklmnopqrstuvwxyz";
+        private static final String CHAR_UPPER = CHAR_LOWER.toUpperCase();
+        private static final String NUMBER = "0123456789";
+        private static final String OTHER_CHAR = "!@#$%&*()_+-=[]?";
+
+        private static final String PASSWORD_ALLOW_BASE = CHAR_LOWER + CHAR_UPPER + NUMBER + OTHER_CHAR;
+        private static final int PASSWORD_LENGTH = 12;
+
+        public static String generateRandomPassword() {
+            if (PASSWORD_LENGTH < 1) throw new IllegalArgumentException("Password length must be at least 1");
+
+            StringBuilder sb = new StringBuilder(PASSWORD_LENGTH);
+            Random random = new SecureRandom();
+            for (int i = 0; i < PASSWORD_LENGTH; i++) {
+                int rndCharAt = random.nextInt(PASSWORD_ALLOW_BASE.length());
+                char rndChar = PASSWORD_ALLOW_BASE.charAt(rndCharAt);
+                sb.append(rndChar);
+            }
+
+            return sb.toString();
+        }
     }
 
 }
