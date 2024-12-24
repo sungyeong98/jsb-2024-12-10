@@ -7,6 +7,8 @@ import com.mysite.sbb.comment.Comment;
 import com.mysite.sbb.comment.CommentService;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionService;
+import com.mysite.sbb.social.SocialUser;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -81,10 +83,19 @@ public class UserController {
     public String profile(@RequestParam(value = "questionPage", defaultValue = "0") int questionPage,
                           @RequestParam(value = "answerPage", defaultValue = "0") int answerPage,
                           @RequestParam(value = "commentPage", defaultValue = "0") int commentPage,
-                          Principal principal, Model model) {
+                          Principal principal, Model model, HttpSession session) {
 
-        // 현재 로그인한 사용자 정보 가져오기
-        SiteUser siteUser = this.userService.getUser(principal.getName());
+        // 소셜 로그인 사용자의 경우 세션에서 정보를 가져옴
+        SocialUser socialUser = (SocialUser) session.getAttribute("user");
+        SiteUser siteUser;
+        
+        if (socialUser != null) {
+            // 소셜 로그인 사용자
+            siteUser = userService.getUser(socialUser.getEmail());
+        } else {
+            // 일반 로그인 사용자
+            siteUser = userService.getUser(principal.getName());
+        }
 
         // 사용자의 질문, 답변, 댓글 데이터 가져오기
         Page<Question> questionPageData = this.questionService.getMyList(siteUser, questionPage);
@@ -92,10 +103,10 @@ public class UserController {
         Page<Comment> commentPageData = this.commentService.getMyList(siteUser, commentPage);
 
         // Model에 데이터 추가
-        model.addAttribute("siteUser", siteUser); // 사용자 정보
-        model.addAttribute("questionPageData", questionPageData); // 질문 데이터
-        model.addAttribute("answerPageData", answerPageData); // 답변 데이터
-        model.addAttribute("commentPageData", commentPageData); // 댓글 데이터
+        model.addAttribute("siteUser", siteUser);
+        model.addAttribute("questionPageData", questionPageData);
+        model.addAttribute("answerPageData", answerPageData);
+        model.addAttribute("commentPageData", commentPageData);
 
         return "profile";
     }
